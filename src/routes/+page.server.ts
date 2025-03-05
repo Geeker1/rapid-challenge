@@ -1,20 +1,17 @@
 import type { Actions } from './$types';
-import { getAllTeeTimes } from '../db/client';
+import { getAllTeeTimes, updateTeeTime } from '../db/client';
 import type { PageServerLoad } from './$types';
 
 export const actions = {
-	change: async (event) => {
+	update: async (event) => {
 		// Update Tee Time from Database
-	},
-    delete: async (event) => {
-        // Delete Tee Time from Database
-    }
+        const formData = await event.request.formData();
+        const data = Object.fromEntries(formData.entries());
+        await updateTeeTime(data.id.toString(), data)
+	}
 } satisfies Actions;
 
-
-
 export const load: PageServerLoad = async ({ fetch }) => {
-    
     // Call the DB library and fetch all tee times
 
 	return {

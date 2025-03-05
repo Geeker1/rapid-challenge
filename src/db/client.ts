@@ -11,52 +11,65 @@ const sql = postgres({
 
 
 export async function getAllTeeTimes() {
-    // const client = await getClient();
-
     try {
         return await sql`SELECT * FROM tee_times;`
     } catch (err) {
-        console.error(err);
-    } finally {
-        // await client.end()
+        throw err;
     }
-
-    return []
 }
 
-export async function deleteTeeTime(id: number) {
-
+export async function deleteTeeTime(id: string) {
     try {
-        const result = await sql`DELETE FROM tee_times WHERE id = ${id} RETURNING *`
-
-        if (result.count > 0){
-            console.log("Tee Time deleted successfully");
-        }
+        await sql`DELETE FROM tee_times WHERE id = ${id} RETURNING *`;
     } catch (err) {
-        console.error(err);
-    } finally {
+        throw err;
     }
 }
 
-export async function updateTeeTime(id: number, data: any) {
+export async function updateTeeTime(id: string, data: any) {
+    console.log("DATA", data)
     try {
         const result = await sql`
         UPDATE tee_times
         SET price = ${data.price}, 
             min_players = ${data.min_players}, 
             max_players = ${data.max_players},
-            time = ${data.time}
             holes = ${data.holes}
         WHERE id = ${id}
         RETURNING *;
         `;
 
-        if (result.count > 0){
-            console.log("Tee Time deleted successfully");
-        }
+        return result
     } catch (err) {
-        console.error(err);
-    } finally {
+        throw err;
     }
 }
- 
+
+function templateBuilder(data: any[]): string {
+    return data.map(d => 
+        `('${d.id}', '${d.time}', ${d.min_players}, ${d.max_players}, ${d.holes}, ${d.price})`
+    ).join(',\n');
+}
+
+export async function bulkInsertTeeTime(tees: any) {
+    const values = tees.map(({ id, time, min_players, max_players, holes, price }: any) => 
+        [id, time, min_players, max_players, holes, price]
+    );
+
+    try {
+        const result = await sql`
+            INSERT INTO tee_times (id, time, min_players, max_players, holes, price)
+            VALUES ${sql(values)}
+            ON CONFLICT (id) 
+            DO UPDATE SET 
+                time = EXCLUDED.time,
+                min_players = EXCLUDED.min_players,
+                max_players = EXCLUDED.max_players,
+                holes = EXCLUDED.holes,
+                price = EXCLUDED.price;
+        `;
+        return result
+    } catch (error) {
+        throw error;
+    }
+}
