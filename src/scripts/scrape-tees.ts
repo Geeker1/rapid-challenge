@@ -2,6 +2,8 @@ import { chromium, devices, type ElementHandle } from 'playwright';
 import { bulkInsertTeeTime } from '../db/client';
 
 
+const WEBSITE_URL = 'https://commonground-golf-course.book.teeitup.com/';
+
 function convertTo24Hour(time: string): string {
     const [match, hours, minutes, period] = time.match(/(\d+):(\d+) (AM|PM)/i) || [];
 
@@ -54,13 +56,9 @@ const mergeTimeWithDate = (timeString: string) => {
 };
 
 function extractHoleData(verbiage: string | undefined): number {
-    if(verbiage == "9"){
-        return 9;
-    } else if (verbiage == "18"){
-        return 18;
-    } else {
-        throw Error("Invalid")
-    }
+    if(verbiage == "9") return 9;
+    if (verbiage == "18") return 18;
+    throw Error("Invalid");
 }
 
 async function extractPriceData(element: ElementHandle<SVGElement | HTMLElement>){
@@ -68,10 +66,9 @@ async function extractPriceData(element: ElementHandle<SVGElement | HTMLElement>
         el => el.textContent?.trim()
     );
 
-    let temp = prices;
-    if (!temp) throw Error("Invalid price");
+    if (!prices) throw Error("Invalid price");
 
-    return parseInt(temp.replace("$", ""), 10);
+    return parseInt(prices.replace("$", ""), 10);
 }
 
 async function processData(element: ElementHandle<SVGElement | HTMLElement>){
@@ -110,7 +107,7 @@ async function processData(element: ElementHandle<SVGElement | HTMLElement>){
     const context = await browser.newContext(devices['Desktop Chrome']);
     const page = await context.newPage();
 
-    await page.goto('https://commonground-golf-course.book.teeitup.com/');
+    await page.goto(WEBSITE_URL);
 
     // Wait for the parent div to appear
     await page.waitForSelector('.MuiGrid-root.css-ibcypl');
@@ -120,9 +117,8 @@ async function processData(element: ElementHandle<SVGElement | HTMLElement>){
     const dataArray = []
 
     for (const element of elements) {
-        const data = await processData(element);
-
         try {
+            const data = await processData(element);
             dataArray.push(data)
         } catch (error) {
             continue
@@ -131,6 +127,8 @@ async function processData(element: ElementHandle<SVGElement | HTMLElement>){
     }
 
     await bulkInsertTeeTime(dataArray);    
+
+    console.log("Data Scraped Successfully!!!")
     
     // Teardown
     await context.close();

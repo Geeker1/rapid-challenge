@@ -72,9 +72,10 @@ To run webscraper tool, it's as simple as running `npm run scrape`.
 
 ## Improvements
 
-Looking at the current implementation, these are my takeaways:
+Looking at the current implementation, these are my choices if I had more time on this:
 
 - Better User Interface
+- Proper State Handling on Svelte (This was sufficient for the task at hand but can be refactored to look neater)
 - Proper Setup of Postgres without resorting to postgres defined defaults.
 - Create a page for users to create tee time data and save to the database.
 - Proper environment handling for svelte and postgres

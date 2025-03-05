@@ -1,12 +1,17 @@
 import postgres from "postgres";
 
+const DB_USER: string = "postgres";
+const DB_PASSWORD: string = "test";
+const DB_HOST: string = "127.0.0.1";
+const DB_PORT: number = 5432;
+const DB_NAME: string = "postgres";
 
 const sql = postgres({
-    user: 'postgres',
-    password: 'test',
-    host: '127.0.0.1',
-    port: 5432,
-    database: 'postgres',
+    user: DB_USER,
+    password: DB_PASSWORD,
+    host: DB_HOST,
+    port: DB_PORT,
+    database: DB_NAME,
 });
 
 
@@ -27,7 +32,6 @@ export async function deleteTeeTime(id: string) {
 }
 
 export async function updateTeeTime(id: string, data: any) {
-    console.log("DATA", data)
     try {
         const result = await sql`
         UPDATE tee_times
@@ -43,12 +47,6 @@ export async function updateTeeTime(id: string, data: any) {
     } catch (err) {
         throw err;
     }
-}
-
-function templateBuilder(data: any[]): string {
-    return data.map(d => 
-        `('${d.id}', '${d.time}', ${d.min_players}, ${d.max_players}, ${d.holes}, ${d.price})`
-    ).join(',\n');
 }
 
 export async function bulkInsertTeeTime(tees: any) {

@@ -13,8 +13,16 @@ export const actions = {
 
 export const load: PageServerLoad = async ({ fetch }) => {
     // Call the DB library and fetch all tee times
+    let tees: any[] = [];
+
+    try {
+        tees = await getAllTeeTimes();
+    } catch (error) {
+        // Error fetching tees, do not render error on server, return empty list instead
+        console.error(error)
+    }
 
 	return {
-		tees: await getAllTeeTimes()
+		tees
 	};
 };

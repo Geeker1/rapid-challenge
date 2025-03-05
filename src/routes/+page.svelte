@@ -60,7 +60,7 @@
 		}
 
         if (result.type === "error" || result.type === "failure"){
-            apiError = "An error occurs while saving tee time."
+            apiError = "An error occurred while saving tee time."
         }
 
 		applyAction(result);
@@ -117,7 +117,7 @@
 {#if edit && currentTee}
 <div>
     <h2 style="margin-top: 60px;">Change Tee Time ({currentTee.time})</h2>
-    <form action="?/update" onsubmit={handleSubmit}>
+    <form style="margin-bottom: 100px;" action="?/update" onsubmit={handleSubmit}>
         <input type="hidden" id="id" name="id" value={currentTee.id.toISOString()}>
 
         <label for="price">Price ($):</label>
