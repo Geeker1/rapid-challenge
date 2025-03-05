@@ -1,0 +1,19 @@
+# Use postgres/example user/password credentials
+version: '3.9'
+
+services:
+
+  db:
+    image: postgres:17.4
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 812mb
+    volumes:
+      - "rapi-data:/var/lib/postgresql/"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: test
+
+volumes:
+  rapi-data:
